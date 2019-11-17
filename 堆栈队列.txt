@@ -1,0 +1,379 @@
+顺序栈
+(1)1.h
+#include<stdio.h>
+#include<malloc.h>
+#include<iostream.h>
+#include<process.h>
+
+#define OK 1
+#define OVERFLOW 0 
+#define ERROR 0 
+#define TRUE 1
+#define FALSE 0
+
+typedef int Status;
+2.h
+#define STACK_INIT_SIZE 100//顺序栈存储空间的初始分配量
+#define STACKINCREMENT 10//顺序栈存储空间的分配增量
+typedef int SElemType;
+typedef struct{
+	SElemType *base;
+	SElemType *top;
+	int stacksize;
+}SqStack;
+3.h
+Status InitStack(SqStack &S){
+S.base=(SElemType *)malloc(STACK_INIT_SIZE*sizeof(SElemType));
+if(!S.base) exit(OVERFLOW);//存储分配失败
+S.top=S.base;
+S.stacksize=STACK_INIT_SIZE;
+return OK;
+}//InitStack
+Status GetTop(SqStack S,SElemType &e){
+if(S.top==S.base) return ERROR;
+e=*(S.top-1);
+return OK;
+}//GetTop
+Status Push(SqStack &S,SElemType  e){
+     //先判断是否栈满
+int *newbase;
+     if(S.top-S.base>=S.stacksize){
+     newbase=(SElemType *)realloc(S.base,(S.stacksize+STACKINCREMENT)*sizeof(SElemType));
+     if(!newbase) exit(OVERFLOW);
+
+     S.top=S.base+S.stacksize;
+     S.stacksize+=STACKINCREMENT;
+     }//if 
+     *++S.top=e;//*S.top=e,S.top++
+     return OK;
+    }//Push
+Status Pop(SqStack &S,SElemType &e){
+     if(S.top==S.base) return ERROR;
+     e=*S.top--;//--S.top,*S.top=e
+     return OK;
+    }//Pop
+Status StackLength(SqStack S){
+     return (S.top-S.base);
+    }//StackLength
+Status StackEmpty(SqStack S){
+     return (S.base==S.top);
+    }//StackEmpty,两指针重合，则为空栈
+void conversion()
+{
+SqStack S;
+SElemType e;
+int N,r;
+InitStack(S);
+cout<<"请输入原操作数以及需要转换的进制";
+cin>>N>>r;
+cout<<"push in to stack"<<endl;
+while(N){
+Push(S,N%r);
+cout<<N%r;
+N=N/r;
+}
+cout<<endl<<"pop out from stack"<<endl;
+while(!StackEmpty(S)){
+Pop(S,e);
+if(e>=0 && e<=9)
+cout<<e;
+else
+printf("%c",e-10+'A');
+}
+}//conversion 进制转换
+Status Compare( ){
+  InitStack(S); flag=TURE;
+  while （（ch= getchar( )）！=‘#’ && flag ） {
+  switch (ch) {
+case ‘(‘ :
+case ‘[‘ :
+caxe ‘{‘ :Push(S,ch);break;
+case ‘)’ :if ( Pop(S,e)==ERROR || e!=‘(‘  )  flag=FALSE;break;
+case ‘]’ :if ( Pop(S,e)==ERROR || e!=‘[‘)    flag=FALSE;break; 
+case ‘}’ :if ( Pop(S,e)==ERROR || e!=‘{‘)   flag=FALSE;break;
+     	   }//switch
+    }
+ if (flag && ch==‘#’ && StackEmpty(S))  return TRUE;
+ else return FALSE;   
+}//compare表达式检验
+OperandType Evaluateexpress(){
+ InitStack(OPTR); Push(OPTR,’#’);
+ InitStack(OPND); c=getchar( );
+ while (c!=‘#’ || GetTop(OPTR)!=‘#’)
+  if （c为操作数）{Push(OPND,c);c=getchar();}//不是运算符进栈
+  else 
+      switch Precede(GetTop(OPTR),c){
+         case ‘<‘:   // 栈顶元素优先权低
+               Push(OPTR,c);c=getchar();break;
+         case ‘=‘:  // 脱括号并接收下一个字符
+               Pop(OPTR,c);c=getchar();break;
+         case ‘>’:   //退栈并将运算结果入栈
+                 Pop(OPTR,thrta);Pop(OPND,b);Pop(OPND,a);
+                 Push(OPND,Operate(a,theta,b);break;
+        }//switch
+}// Evaluateexpress算数表达式求值
+
+
+4.cpp
+#include"1.h"
+#include"2.h"
+#include"3.h"
+int main()
+{
+	conversion();//进制转换
+	Compare( );//表达式检验
+	OperandType Evaluateexpress();算数表达式求值
+	return 0;
+}
+链栈
+1.h
+#include<stdio.h>
+#include<malloc.h>
+#include<iostream.h>
+#include<process.h>
+
+#define OK 1
+#define OVERFLOW 0 
+#define ERROR 0 
+#define TRUE 1
+#define FALSE 0
+
+typedef int elemtype;
+2.h
+typedef struct LinkedStackNode
+{
+	elemtype data;
+	LinkedStackNode *next;
+}LinkedStackNode,*LinkedStack;
+3.h
+LinkedStack Init_LinkedStack()
+{
+	LinkedStack top = (LinkedStackNode *)malloc(sizeof(LinkedStackNode));  
+	                              //栈顶指针变量
+	if(top != NULL)
+	{
+		top->next = NULL;
+	}
+	return top;
+}//Init_LinkedStack
+
+int LinkedStack_Empty(LinkedStack top)
+{
+	if(top->next == NULL)//如果栈顶的指针域指向空，则栈空
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}//LinkedStack_Empty
+
+int Push_LinkedStack(LinkedStack top,elemtype x)
+{
+	LinkedStackNode * node = (LinkedStackNode *)malloc(sizeof(LinkedStackNode));
+ 
+	if(node == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		node->data = x;
+		node->next = top->next;
+		top->next = node;
+		return 1;
+	}
+}//Push_LinkedStack
+
+int Pop_LinkedStack(LinkedStack top,elemtype *x)
+{
+	LinkedStackNode *node;
+	if(top->next == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		node = top->next;
+		*x = node->data;
+		top->next = node->next;
+		free(node);
+		return 1;
+	}
+}//Pop_LinkedStack
+
+int Get_LinkedStack(LinkedStack top,elemtype *x)
+{
+	if(top->next == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		*x = top->next->data;
+		return 1;
+	}
+}//Get_LinkedStack
+4.h
+#include"1.h"
+#include"2.h"
+#include"3.h"
+int main()
+{
+	return 0;
+}
+链队列
+1.h
+#include<stdio.h>
+#include<malloc.h>
+#include<iostream.h>
+#include<process.h>
+
+#define OK 1
+#define OVERFLOW 0 
+#define ERROR 0 
+#define TRUE 1
+#define FALSE 0
+
+typedef int Status;
+2.h
+typedef struct QNode {// 结点类型
+    QElemType      data;
+    struct QNode  *next;
+  } QNode, *QueuePtr;
+typedef struct { // 链队列类型
+    QueuePtr  front;  // 队头指针
+    QueuePtr  rear;   // 队尾指针
+} LinkQueue;
+3.h
+Status InitQueue(LinkQueue &Q) {
+   // 构造一个空队列Q
+   Q.front = Q.rear =
+               (QueuePtr)malloc(sizeof(QNode));
+   if (!Q.front) exit (OVERFLOW);                   
+                                            //存储分配失败
+   Q.front->next = NULL;
+   return OK;
+}//InitQueue
+
+Status EnQueue(LinkQueue &Q,QElemType e) {
+    // 插入元素e为Q的新的队尾元素
+    p = (QueuePtr) malloc (sizeof (QNode));
+    if (!p)  exit (OVERFLOW);   //存储分配失败
+    p->data = e;   p->next = NULL;
+    Q.rear->next = p;    Q.rear = p;
+    return OK;
+}//EnQueue
+
+Status DeQueue(LinkQueue &Q,QElemType &e) {
+  // 若队列不空，则删除Q的队头元素，
+  //用 e 返回其值，并返回OK；否则返回ERROR
+   if (Q.front == Q.rear)    return ERROR;
+   p = Q.front->next;   e = p->data;
+   Q.front->next = p->next;
+   if (Q.rear == p)  Q.rear = Q.front;
+   free (p);      return OK;
+}//DeQueue
+
+Status DestroyQueue(LinkQueue &Q) {
+   // 销毁队列Q
+    while(Q.front) {
+       P=Q.front->next;
+       free(Q.front);   
+       Q.front =P;
+     }   
+  Q.rear=Q.front;
+  return OK;
+}//DestroyQueue
+void YangHuiTriangle(){
+    SeqQueue Q;
+    InitQueue(&Q);
+    EnterQueue(&Q,1); //第一行入列
+    for(n=2;n<=N;n++) //产生第n行元素并入列，同时打印第n－1行的元素
+    {
+        EnterQueue(&Q,1);  //第一个元素手动加入，为1
+        for (i=1; i<=n-2; i++)  //除去两个1，中间的n－2个元素用‘和’求出
+        {
+            DeleteQueue(&Q,&temp);
+            Printf("%d",temp);     //出列并打印第n－1行的元素
+            GetHead(Q,&x);
+            temp=temp+x;     //求和
+            EnterQueue(&Q,temp);
+        }
+        DeleteQueue(&Q,&x);
+        printf("%d",x);   //打印 n－1行 最后一个元素
+        EnterQueue(&Q,1); //n行最后一个元素（1）入列
+    }
+}
+
+4.h
+#include"1.h"
+#include"2.h"
+#include"3.h"
+int main()
+{
+	return 0;
+}
+循环队列
+1.h
+#include<stdio.h>
+#include<malloc.h>
+#include<iostream.h>
+#include<process.h>
+
+#define OK 1
+#define OVERFLOW 0 
+#define ERROR 0 
+#define TRUE 1
+#define FALSE 0
+
+typedef int Status;
+2.h
+#define MAXQSIZE  100  //最大队列长度
+typedef struct{
+    QElemType  *base; // 动态分配存储空间
+    int  front; // 头指针，若队列不空，
+               //  指示队列头元素的位置
+    int  rear;// 尾指针，若队列不空，指示
+             // 队列尾元素 的下一个位置
+}SqQueue;
+3.h
+Status InitQueue(SqQueue &Q) {
+   // 构造一个空队列Q
+   Q.base = (ElemType *) malloc(MAXQSIZE *sizeof (ElemType));
+   if (!Q.base) exit (OVERFLOW);// 存储分配失败
+   Q.front = Q.rear = 0;
+   return OK;
+ }//InitQueue
+
+int QueueLength(SqQueue Q) {
+   // 返回队列Q的元素个数，即队列长度
+  return(Q.rear-Q.front+MAXQSIZE)%MAXQSIZE;
+ }//QueueLength
+
+Status EnQueue(SqQueue &Q, ElemType e) { // 插入元素e为Q的新的队尾元素
+    if ((Q.rear+1) % MAXQSIZE == Q.front) 
+        return ERROR; //队列满
+    Q.base[Q.rear] = e;
+    Q.rear = (Q.rear+1) % MAXQSIZE;
+    return OK;
+}//EnQueue
+
+Status DeQueue(SqQueue &Q, ElemType &e) {  // 若队列不空，则删除Q的队头元素，
+   // 用e返回其值，并返回OK;  否则返回ERROR
+    if (Q.front == Q.rear)  return ERROR;
+    e = Q.base[Q.front];
+    Q.front = (Q.front+1) % MAXQSIZE;
+    return OK;
+}//DeQueue
+4.h
+#include"1.h"
+#include"2.h"
+#include"3.h"
+int main()
+{
+	return 0;
+}
+
+
